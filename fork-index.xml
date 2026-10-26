@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='utf-8'?>
+<index version="1" name="reaper-keys-performance">
+  <category name="Scripts">
+    <reapack name="install-reaper-keys.lua" type="script" desc="reaper-keys: performance fork and production coach">
+      <metadata>
+        <link rel="website" href="https://github.com/i-oliva/reaper-keys">Fork repository</link>
+      </metadata>
+      <version name="2.0.0-a21" author="gwatcha, i-oliva contributors" time="2026-10-26T15:46:20Z">
+        <source file="../LICENSE">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/LICENSE</source>
+        <source file="../README.md">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/README.md</source>
+        <source main="main" file="create-practice-project.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/Scripts/create-practice-project.lua</source>
+        <source main="main">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/Scripts/install-reaper-keys.lua</source>
+        <source main="main" file="show-production-coach.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/Scripts/show-production-coach.lua</source>
+        <source file="../docs/architecture.md">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/architecture.md</source>
+        <source file="../docs/assets/coach-home.png">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/assets/coach-home.png</source>
+        <source file="../docs/assets/coach-loop.png">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/assets/coach-loop.png</source>
+        <source file="../docs/assets/coach-midi.png">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/assets/coach-midi.png</source>
+        <source file="../docs/performance.md">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/performance.md</source>
+        <source file="../docs/production-guide.md">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/docs/production-guide.md</source>
+        <source file="../internal/action_sequence.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/action_sequence.lua</source>
+        <source file="../internal/binding_search.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/binding_search.lua</source>
+        <source file="../internal/build.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/build.lua</source>
+        <source file="../internal/coach/lessons.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/coach/lessons.lua</source>
+        <source file="../internal/coach/view.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/coach/view.lua</source>
+        <source file="../internal/default_state.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/default_state.lua</source>
+        <source file="../internal/definitions/actions.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/definitions/actions.lua</source>
+        <source file="../internal/definitions/bindings.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/definitions/bindings.lua</source>
+        <source file="../internal/definitions/config.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/definitions/config.lua</source>
+        <source file="../internal/dispatch.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/dispatch.lua</source>
+        <source file="../internal/execute_command.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/execute_command.lua</source>
+        <source file="../internal/gui/binding_list/View.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/binding_list/View.lua</source>
+        <source file="../internal/gui/binding_list/binding_list_box.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/binding_list/binding_list_box.lua</source>
+        <source file="../internal/gui/binding_list/controller.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/binding_list/controller.lua</source>
+        <source file="../internal/gui/feedback/View.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/feedback/View.lua</source>
+        <source file="../internal/gui/feedback/completions.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/feedback/completions.lua</source>
+        <source file="../internal/gui/feedback/controller.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/feedback/controller.lua</source>
+        <source file="../internal/gui/feedback/message.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/feedback/message.lua</source>
+        <source file="../internal/gui/feedback/model.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/feedback/model.lua</source>
+        <source file="../internal/gui/utils.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/gui/utils.lua</source>
+        <source file="../internal/log.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/log.lua</source>
+        <source file="../internal/marks.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/marks.lua</source>
+        <source file="../internal/meta_command.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/meta_command.lua</source>
+        <source file="../internal/movement_utils.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/movement_utils.lua</source>
+        <source file="../internal/movements.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/movements.lua</source>
+        <source file="../internal/reaper_state.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/reaper_state.lua</source>
+        <source file="../internal/repetition.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/repetition.lua</source>
+        <source file="../internal/rk.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/rk.lua</source>
+        <source file="../internal/types.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/types.lua</source>
+        <source file="../internal/utils.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/internal/utils.lua</source>
+        <source file="../vendor/fuzzy.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/fuzzy.lua</source>
+        <source file="../vendor/scythe/gui/config.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/config.lua</source>
+        <source file="../vendor/scythe/gui/core.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/core.lua</source>
+        <source file="../vendor/scythe/gui/element.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/element.lua</source>
+        <source file="../vendor/scythe/gui/elements/Button.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Button.lua</source>
+        <source file="../vendor/scythe/gui/elements/Checklist.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Checklist.lua</source>
+        <source file="../vendor/scythe/gui/elements/ColorPicker.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/ColorPicker.lua</source>
+        <source file="../vendor/scythe/gui/elements/Frame.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Frame.lua</source>
+        <source file="../vendor/scythe/gui/elements/Knob.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Knob.lua</source>
+        <source file="../vendor/scythe/gui/elements/Label.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Label.lua</source>
+        <source file="../vendor/scythe/gui/elements/Listbox.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Listbox.lua</source>
+        <source file="../vendor/scythe/gui/elements/Menubar.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Menubar.lua</source>
+        <source file="../vendor/scythe/gui/elements/Menubox.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Menubox.lua</source>
+        <source file="../vendor/scythe/gui/elements/Radio.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Radio.lua</source>
+        <source file="../vendor/scythe/gui/elements/Slider.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Slider.lua</source>
+        <source file="../vendor/scythe/gui/elements/Tabs.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Tabs.lua</source>
+        <source file="../vendor/scythe/gui/elements/TextEditor.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/TextEditor.lua</source>
+        <source file="../vendor/scythe/gui/elements/Textbox.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/Textbox.lua</source>
+        <source file="../vendor/scythe/gui/elements/shared/option.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/shared/option.lua</source>
+        <source file="../vendor/scythe/gui/elements/shared/text.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/elements/shared/text.lua</source>
+        <source file="../vendor/scythe/gui/layer.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/layer.lua</source>
+        <source file="../vendor/scythe/gui/theme.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/theme.lua</source>
+        <source file="../vendor/scythe/gui/window.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/gui/window.lua</source>
+        <source file="../vendor/scythe/public/buffer.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/buffer.lua</source>
+        <source file="../vendor/scythe/public/color.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/color.lua</source>
+        <source file="../vendor/scythe/public/const.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/const.lua</source>
+        <source file="../vendor/scythe/public/error.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/error.lua</source>
+        <source file="../vendor/scythe/public/file.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/file.lua</source>
+        <source file="../vendor/scythe/public/font.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/font.lua</source>
+        <source file="../vendor/scythe/public/gfx.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/gfx.lua</source>
+        <source file="../vendor/scythe/public/image.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/image.lua</source>
+        <source file="../vendor/scythe/public/math.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/math.lua</source>
+        <source file="../vendor/scythe/public/menu.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/menu.lua</source>
+        <source file="../vendor/scythe/public/message.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/message.lua</source>
+        <source file="../vendor/scythe/public/sprite.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/sprite.lua</source>
+        <source file="../vendor/scythe/public/string.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/string.lua</source>
+        <source file="../vendor/scythe/public/table.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/table.lua</source>
+        <source file="../vendor/scythe/public/text.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/public/text.lua</source>
+        <source file="../vendor/scythe/scythe.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/scythe/scythe.lua</source>
+        <source file="../vendor/serpent.lua">https://raw.githubusercontent.com/i-oliva/reaper-keys/882cd6701f496a874689f6f4bf28e96b8a5cf3ff/vendor/serpent.lua</source>
+      </version>
+    </reapack>
+  </category>
+</index>
