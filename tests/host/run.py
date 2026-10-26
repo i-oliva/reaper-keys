@@ -145,6 +145,13 @@ def main():
                                 subprocess.run(['import', '-window', 'root', str(case / 'search-execute.png')], env=child_env, check=True)
                             assert not xdo('search', '--onlyvisible', '--name', '^Reaper Keys Binding List$').stdout.strip(), 'Browser did not execute/close'
                             print('PASS real keyboard -> binding browser -> query -> Enter')
+                            xdo('windowactivate', '--sync', main_windows[0], 'key', '--delay', '80', 'space', 'question')
+                            time.sleep(0.7)
+                            coaches = xdo('search', '--onlyvisible', '--name', '^Reaper Keys - Production Coach$').stdout.split()
+                            assert coaches, 'Space ? did not launch the coach'
+                            xdo('windowactivate', '--sync', coaches[0], 'key', 'Escape'); time.sleep(0.2)
+                            assert not xdo('search', '--onlyvisible', '--name', '^Reaper Keys - Production Coach$').stdout.strip()
+                            print('PASS real Space ? -> separate coach window -> Escape')
                         if mode == 'demo':
                             coaches = xdo('search', '--onlyvisible', '--name', '^Reaper Keys - Production Coach$').stdout.split()
                             assert coaches, 'Coach window missing'
