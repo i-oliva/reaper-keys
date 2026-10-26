@@ -1,0 +1,15 @@
+name: Lua regression and performance budgets
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  lua:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: sudo apt-get update && sudo apt-get install -y lua5.4
+      - run: sh tests/run-lua
+      - run: python3 tests/test_install.py
+      - run: lua5.4 tools/export-guide.lua && git diff --exit-code -- docs/production-guide.md

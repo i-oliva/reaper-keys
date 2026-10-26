@@ -1,9 +1,9 @@
 local utils = require 'utils'
-local FeedbackView = require 'gui.feedback.View'
 local reaper_state = require 'reaper_state'
 local model = require 'gui.feedback.model'
 local config = require 'definitions.config'.general
 local feedback = {}
+local pending = {}
 
 function feedback.displayCompletions(future_entries)
     local completions = {}
@@ -35,7 +35,9 @@ function feedback.displayCompletions(future_entries)
             end
         end
 
-        table.sort(completions, function(a, b)
+    end
+
+    table.sort(completions, function(a, b)
             if a.folder and not b.folder then return true end
             if not a.folder and b.folder then return false end
             if not a.folder and not b.folder and a.action_type ~= b.action_type then
@@ -44,8 +46,7 @@ function feedback.displayCompletions(future_entries)
             return a.value < b.value
         end)
 
-        model.setKeys({ completions = completions })
-    end
+    pending.completions = completions
 end
 
 local startup_msg =
@@ -63,13 +64,10 @@ function feedback.update()
     local just_opened = reaper_state.clearJustOpenedFlag()
 
     if feedback_view_open and not just_opened then
-        local update_number = tonumber(model.getKey("update_number") or 0)
-        if update_number > 20 then update_number = 0 end
-        model.setKeys({ update_number = update_number + 1 })
         return
     end
 
-    feedback_view = FeedbackView:new()
+    feedback_view = require('gui.feedback.View'):new()
     feedback_view:open()
 
     if config.show_start_up_message then
@@ -89,22 +87,25 @@ function feedback.update()
     reaper.atexit(function()
         model.setKeys({ open = false })
         local window_settings = feedback_view:getWindowSettings()
-        model.setKeys({ window_settings = window_settings })
+        reaper_state.set('feedback_window', window_settings)
     end)
 end
 
 function feedback.displayMessage(message)
-    model.setKeys({ message = message })
+    pending.message = message
 end
 
 function feedback.displayState(state)
     local right_text = state.macro_recording and ("(rec %s..)"):format(state.macro_register) or ""
-    model.setKeys({ right_text = right_text, mode = state['mode'] })
+    pending.right_text, pending.mode = right_text, state.mode
+    pending.update_number = (tonumber(model.getKey('update_number')) or 0) + 1
+    model.setKeys(pending)
+    pending = {}
     feedback.update()
 end
 
 function feedback.clear()
-    model.setKeys({ message = "", completions = "", mode = "" })
+    pending = {message = '', completions = {}, mode = ''}
 end
 
 return feedback

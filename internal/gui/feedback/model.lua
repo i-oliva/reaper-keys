@@ -13,7 +13,7 @@ function model.setKeys(data)
 end
 
 function model.get()
-  return reaper_state.get(data_namespace)
+  return reaper_state.observe(data_namespace)
 end
 
 return model

@@ -130,7 +130,7 @@ function module.fuzzy_match(pattern, str)
 		table.insert(matchedIndices, bestLetterIdx)
 	end
 
-	local matched = patternIdx == patternLength
+	local matched = patternIdx > patternLength
 	return matched, score, matchedIndices
 end
 

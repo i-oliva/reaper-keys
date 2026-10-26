@@ -2,9 +2,9 @@ local BindingListView = require('gui.binding_list.View')
 local buildCommandWithCompletions = require 'build'
 local gui_utils = require('gui.utils')
 local reaper_state = require('reaper_state')
-local fuzzy_match = require('fuzzy').fuzzy_match
+local search = require 'binding_search'
 local GUI = require('gui.core')
-local run = require 'action_sequence'.run
+local dispatch = require 'dispatch'
 local definition_tables = require "definitions.bindings"
 local utils = require 'utils'
 
@@ -47,6 +47,7 @@ end
 local function createBindingList(state)
   local data = {}
   local _, state_entries = buildCommandWithCompletions(state, false)
+  state_entries = state_entries or {}
   local bindings = getAllBindings()
 
   for context,context_bindings in pairs(bindings) do
@@ -76,18 +77,7 @@ local function createBindingList(state)
   return data
 end
 
-function rowIsFiltered(row, element_values)
-  if (element_values.query ~= "" and row.match_score < -3) or
-    (element_values.state_filter_active and not row.is_valid_in_state) or
-    (element_values.context_filter_active and row.context ~= element_values.context) or
-    (element_values.action_type_filter_active and row.action_type ~= element_values.action_type) then
-      return true
-  end
-
-  return false
-end
-
-function getElementValues(view)
+local function getElementValues(view)
   local context_i, context = view.elements.context_filter:val()
   local action_type_i, action_type = view.elements.action_type_filter:val()
   return {
@@ -101,32 +91,6 @@ function getElementValues(view)
     action_type_i = action_type_i,
     query = view.elements.query:val(),
   }
-end
-
-function createDisplayedList(full_binding_list, element_values)
-  local displayed_list = {}
-  for _,row in ipairs(full_binding_list) do
-    row.sequential_match, row.match_score, row.matched_indices = fuzzy_match(element_values.query, row.action_name)
-    if not rowIsFiltered(row, element_values) then
-      table.insert(displayed_list, row)
-    end
-  end
-
-  if element_values.query ~= "" then
-    table.sort(displayed_list, function(a, b)
-      return a.match_score > b.match_score
-    end)
-  else
-    table.sort(displayed_list, function(a, b)
-      if a.action_type == b.action_type then
-        return a.action_name < b.action_name
-      else
-        return a.action_type > b.action_type
-      end
-    end)
-  end
-
-  return displayed_list
 end
 
 function binding_list.open(state)
@@ -144,18 +108,16 @@ function binding_list.open(state)
 
   local function updateLoop()
     local new_element_values = getElementValues(view)
-    local update_list = false
-    for element_name,new_value in pairs(new_element_values) do
-      if element_values[element_name] ~= new_value then
-        element_values[element_name] = new_value
-        update_list = true
-      end
+    if search.changed(element_values, new_element_values) then
+      local box = view.elements.binding_list_box
+      box.list = search.filter(full_binding_list, new_element_values)
+      view.selected_i = #box.list > 0 and 1 or 0
+      box:val(view.selected_i)
+      box.windowY = 1
+      box:recalculateWindow()
+      box:redraw()
     end
-
-    if update_list then
-      update_list = false
-      view.elements.binding_list_box.list = createDisplayedList(full_binding_list, new_element_values)
-    end
+    element_values = new_element_values
 
     if view.window.state.resized then
       view.window.state.resized = false
@@ -164,10 +126,27 @@ function binding_list.open(state)
 
     if view.action_executed then
       local selected_row = view.elements.binding_list_box.list[view.selected_i]
-      if selected_row then
-        run(selected_row.action_name)
+      view.action_executed = false
+      if not selected_row then return end
+      local candidate = {context = state.context, mode = state.mode, key_sequence = selected_row.action_binding}
+      local command = selected_row.is_valid_in_state and buildCommandWithCompletions(candidate, true)
+      if not command then
+        reaper.ShowMessageBox('This binding needs a motion, selection, register, or a different context.\n' ..
+          'Close this window and type ' .. selected_row.action_binding .. ' in Arrange/MIDI; follow the completion hints.',
+          'Composed binding', 0)
+        return
       end
       view.window:close()
+      -- Never bypass composition or send a MIDI action to the main section.
+      local ok, result = xpcall(function() return dispatch(state, command) end, debug.traceback)
+      if ok then
+        reaper_state.setState(result)
+      else
+        local recovered = reaper_state.getState()
+        recovered.key_sequence, recovered.macro_recording = '', false
+        reaper_state.setState(recovered)
+        require('log').error(result)
+      end
     end
   end
 

@@ -147,6 +147,7 @@ local global = { -- applies both to main and midi
             ["4"] = "InsertTrackFromTemplateSlot4",
         } },
         ["<SPC>"] = { "+leader commands", {
+            ['?'] = 'ShowProductionCoach',
             N = "ShowNotesWindow",
             n = { "+notes", {
                 i = "ShowNotesItem",

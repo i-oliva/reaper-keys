@@ -1,4 +1,17 @@
-# Reaper keys
+# Reaper keys — performance + production coach
+
+This is [i-oliva's fork](https://github.com/i-oliva/reaper-keys) of
+[gwatcha/reaper-keys](https://github.com/gwatcha/reaper-keys), based on 2.0.0-a20.
+It preserves the default keys, improves the input/feedback/search paths, and adds
+an in-REAPER production coach: **Space, then ?**.
+
+- [Start the production guide (with REAPER screenshots)](docs/production-guide.md)
+- [Benchmarks, changes, installation and rollback](docs/performance.md)
+- [How the code works](docs/architecture.md)
+
+In the isolated Linux REAPER test, median fresh-key processing fell from 5.617 ms
+to 3.390 ms. This measures script processing, not audio or physical input latency.
+The fork is **2.0.0-a21 (alpha)**; see the test coverage and limits before upgrading.
 
 <p align="center"><img src="https://i.ibb.co/QHrVqNK/reaper-keys.png" alt="reaper-keys" border="0" /></p>
 
@@ -12,16 +25,17 @@ to [examples](#some-ideas-to-start-with).
 
 ## Pros
 
-- Save a couple minutes per hour
-- Develop arthritis at 60 instead of 40
-- Reduce mouse usage
-- Increase maximum bandwidth between your brain and your project
-- A structure for Reaper's giant bag of actions
+- Use short sequences instead of memorizing many modifier chords.
+- Repeat musical distances and common edits with counts.
+- See selections before applying an operation.
+- Keep the mouse for plug-ins, fades, routing and other visual work.
 
 ## Installation
 
-- Add `https://raw.githubusercontent.com/gwatcha/reaper-keys/master/index.xml` to Reapack.
-- Install [SWS](https://sws-extension.org/) by hand or from ReaTeam Extensions.
+- **Existing installation:** use the [source-upgrade/rollback instructions](docs/performance.md#existing-installation-preserve-your-shortcut-map). They preserve your keymap and config.
+- **Fresh fork installation:** add `https://raw.githubusercontent.com/i-oliva/reaper-keys/performance-and-coach/fork-index.xml` to ReaPack. Do not use the legacy `index.xml` for this fork.
+- Install [SWS](https://sws-extension.org/) by hand or from ReaTeam Extensions. The GUI library is bundled.
+- Export your existing keymap before importing a generated replacement. Do not enable both upstream and fork input handlers together.
 
 ## Features
 ### Bind key sequences
@@ -64,9 +78,9 @@ commands.
 
 Macros are a way to save a sequence of commands, and play them back later.
 
-To record a macro, enter `q` and an arbitrary character to specify the `register` that the
+To record a macro, enter `,` and an arbitrary character to specify the `register` that the
 macro will save into. Then, perform a series of actions, and finish recording by pressing
-`q`.
+`,` again. `q` opens the options folder; it does not record macros.
 
 <a href="https://ibb.co/z7zsS81"><img src="https://i.ibb.co/z7zsS81/macro-rec.gif"
 alt="macro-rec" border="0" /></a>
@@ -116,7 +130,7 @@ l  # jump right
 !  # play and loop
 ```
 
-If you want to adjust item volume:
+If you want to adjust the selected track's volume:
 
 ```
 <C+<Space>> # show mixer (for visual feedback)
@@ -124,6 +138,10 @@ If you want to adjust item volume:
 ```
 
 ## Help
+
+Press **Space, then ?** to open the production coach. Its **New practice tab…**
+button creates a confirmed, separate MIDI practice project without altering the
+current one. The [written guide](docs/production-guide.md) follows the same lessons.
 
 Enter `<CM-x> (Ctrl + Alt + x)` to show a list of available bindings you can search and
 filter.
@@ -153,6 +171,11 @@ git clone https://github.com/gwatcha/reaper-keys --shallow-since="2024-05-22"
 ```
 
 ### Running tests
+
+The fork's fast checks run with `sh tests/run-lua` and
+`python3 tests/test_install.py`. The [isolated host runner](docs/performance.md#reproduce-the-checks)
+tests in a new virtual display and private REAPER profile. The older upstream
+workflow below is retained for its `.rks` fixtures.
 
 For running tests locally you'd need some Linux distribution with X11 and `xdotool`.
 

@@ -8,7 +8,10 @@ local namespace = "reaper_keys"
 ---@param lua_table table
 function reaper_state.set(table_name, lua_table)
     local serialized = serpent.dump(lua_table, { comment = false })
-    reaper.SetExtState(namespace, table_name, serialized, true)
+    -- Keystrokes and feedback are IPC, not preferences. Keep durable macros,
+    -- marks and window geometry, but never persist these hot-path tables.
+    local persist = table_name ~= 'state' and table_name ~= 'feedback'
+    reaper.SetExtState(namespace, table_name, serialized, persist)
 end
 
 ---retrieve a table from the reaper ext state
@@ -16,10 +19,27 @@ end
 ---@return table|nil ext_value
 function reaper_state.get(table_name)
     local state = reaper.GetExtState(namespace, table_name)
-    if not state then return nil end
+    if not state or state == '' then return nil end
     local ok, table = serpent.load(state)
     if not ok or not table or type(table) ~= 'table' then return nil end
     return table
+end
+
+-- Read-only snapshots for polling views. Compare the serialized value before
+-- parsing; another ReaScript can publish an update between any two calls.
+local observed = {}
+function reaper_state.observe(table_name)
+    local raw = reaper.GetExtState(namespace, table_name)
+    local cached = observed[table_name]
+    if cached and cached.raw == raw then return cached.value end
+    local ok, value = serpent.load(raw or '')
+    value = ok and type(value) == 'table' and value or nil
+    observed[table_name] = {raw = raw, value = value}
+    return value
+end
+
+function reaper_state.stateToken()
+    return reaper.GetExtState(namespace, 'state')
 end
 
 ---set all the keys in new_data to the table_name in ext_state
@@ -65,7 +85,7 @@ local function append(name, key, new_data)
     local all_data = reaper_state.get(name)
     if not all_data then
         all_data = {}
-        all_data[key] = new_data
+        all_data[key] = { new_data }
         reaper_state.set(name, all_data)
         return
     end
@@ -105,7 +125,11 @@ end
 
 ---@return State
 function reaper_state.getState()
-    return reaper_state.get(rk_state_table_name) or default_state
+    local state = reaper_state.get(rk_state_table_name)
+    if state then return state end
+    -- Never return the mutable default table itself.
+    local _, fresh = serpent.load(serpent.dump(default_state))
+    return fresh
 end
 
 return reaper_state

@@ -25,13 +25,13 @@ end
 local function stripPrefix(str, prefix)
     if #prefix >= #str then return nil end
     if #prefix == 0 then return str end
-    local next_key, next_key_in_start, rest
-    for _ = 1, #prefix do
-        next_key, rest = utils.splitFirstKey(str)
-        next_key_in_start, _ = utils.splitFirstKey(prefix)
-        if next_key_in_start ~= next_key then return nil end
+    while prefix ~= '' do
+        local key, prefix_key
+        key, str = utils.splitFirstKey(str)
+        prefix_key, prefix = utils.splitFirstKey(prefix)
+        if key ~= prefix_key then return nil end
     end
-    return rest
+    return str
 end
 
 local function checkIfActionHasOptionSet(action_name, option_name)
@@ -50,7 +50,12 @@ local function checkIfActionHasOptionsSet(action_name, option_names)
   return true
 end
 
+-- Definitions are immutable for the lifetime of this Lua invocation.
+local filtered_cache = {}
 local function filterEntries(options, entries)
+  local cache_key = table.concat(options, ',')
+  local cached = filtered_cache[entries]
+  if cached and cached[cache_key] then return cached[cache_key] end
   local filtered_entries = {}
   for key_seq,entry_val in pairs(entries) do
     if utils.isFolder(entry_val) then
@@ -69,6 +74,8 @@ local function filterEntries(options, entries)
     end
   end
 
+  filtered_cache[entries] = cached or {}
+  filtered_cache[entries][cache_key] = filtered_entries
   return filtered_entries
 end
 
@@ -76,7 +83,7 @@ end
 ---@param match_regex string
 ---@return string?, string
 local function splitFirstMatch(key_sequence, match_regex)
-    local match = key_sequence:match(match_regex)
+    local match = key_sequence:match('^' .. match_regex)
     if not match then return nil, key_sequence end
     return match, key_sequence:sub(match:len() + 1)
 end
@@ -143,10 +150,12 @@ local function getEntryForKeySequence(key_sequence, entries)
   return nil
 end
 
-local function getFutureEntriesOnActionSequence(key_sequence, action_sequence, entries)
-    if #action_sequence == 0 then return nil end
+local getActionKey
+local function getFutureEntriesOnActionSequence(key_sequence, action_sequence, entries, index)
+    index = index or 1
+    if index > #action_sequence then return nil end
 
-    local current_action_type = action_sequence[1]
+    local current_action_type = action_sequence[index]
 
     local entries_for_current_action_type = entries[current_action_type]
     if not entries_for_current_action_type then return nil end
@@ -164,11 +173,10 @@ local function getFutureEntriesOnActionSequence(key_sequence, action_sequence, e
     while #rest_of_sequence ~= 0 do
         next_key, rest_of_sequence = utils.splitFirstKey(rest_of_sequence)
         key_sequence_to_try = key_sequence_to_try .. next_key
-        local entry = getEntryForKeySequence(key_sequence_to_try, entries_for_current_action_type)
+        local entry = getActionKey(key_sequence_to_try, entries_for_current_action_type)
 
         if entry then
-            table.remove(action_sequence, 1)
-            return getFutureEntriesOnActionSequence(rest_of_sequence, action_sequence, entries)
+            return getFutureEntriesOnActionSequence(rest_of_sequence, action_sequence, entries, index + 1)
         end
     end
 
@@ -180,7 +188,7 @@ local function splitLastKey(key_sequence)
     return table.concat(keys, "", 1, #keys - 1), keys[#keys]
 end
 
-local function getActionKey(key_sequence, entries)
+getActionKey = function(key_sequence, entries)
     local action_name = getEntryForKeySequence(key_sequence, entries)
     local no_register =
         not checkIfActionHasOptionSet(action_name, 'registerAction')
@@ -293,7 +301,7 @@ local function buildCommandWithSequence(key_sequence, action_sequence, entries)
     local action_key
     local tail = key_sequence
 
-    for _, action_type in pairs(action_sequence) do
+    for _, action_type in ipairs(action_sequence) do
         tail, action_key = stripNextActionKeyInKeySequence(tail, entries[action_type])
         if not tail then return nil end
         table.insert(command.action_sequence, action_type)
@@ -312,7 +320,7 @@ local function buildCommandWithCompletions(state, build)
     if not sequences or not entries then return nil, nil end
     if not build then goto build_completions end
 
-    for _, action_sequence in pairs(sequences) do
+    for _, action_sequence in ipairs(sequences) do
         local command = buildCommandWithSequence(state.key_sequence, action_sequence, entries)
         if command then
             command.mode = state.mode
@@ -325,19 +333,15 @@ local function buildCommandWithCompletions(state, build)
     local future_entries = {}
     local found = false
 
-    for _, action_sequence in pairs(sequences) do
+    for _, action_sequence in ipairs(sequences) do
         local next_action_type_for_sequence, entries_for_sequence = getFutureEntriesOnActionSequence(
             state.key_sequence, action_sequence, entries)
         if not entries_for_sequence then goto next_sequence_complete end
         found = true
 
-        if not future_entries[next_action_type_for_sequence] then
-            future_entries[next_action_type_for_sequence] = entries_for_sequence
-        else
-            for key, entry in pairs(entries_for_sequence) do
-                future_entries[next_action_type_for_sequence][key] = entry
-            end
-        end
+        local target = future_entries[next_action_type_for_sequence] or {}
+        future_entries[next_action_type_for_sequence] = target
+        for key, entry in pairs(entries_for_sequence) do target[key] = entry end
 ::next_sequence_complete::
     end
 

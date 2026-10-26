@@ -1,2 +1,5 @@
 tests/reaper
 tests/output-*
+__pycache__/
+*.pyc
+tests/reaper-license.rk

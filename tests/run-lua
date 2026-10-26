@@ -1,0 +1,10 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+LUA=${LUA:-lua5.4}
+LUAC=${LUAC:-luac5.4}
+find internal vendor Scripts tests/lua -name '*.lua' -exec "$LUAC" -p {} \;
+"$LUA" tests/lua/regression.lua
+"$LUA" tests/lua/performance.lua
+"$LUA" tests/lua/navigation.lua 20000
+"$LUA" tests/lua/lessons.lua

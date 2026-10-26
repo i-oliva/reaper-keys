@@ -9,9 +9,9 @@ The main feature reaper-keys provides is the ability to compose actions of diffe
 
 How one can compose action types (i.e. the available _action sequences_) and their behaviour when joined is dependant on the [mode](modes) of reaper-keys. 
 
-Take as an example the `timeline motion` type as well as the `timeline operator` type. In normal mode, any `timeline motion` may precede any `timeline operator`. When this action sequence is entered, it will result in the `timeline operator` being called on the timeline section between the cursor position before the motion and after the motion.
+Take as an example the `timeline motion` type as well as the `timeline operator` type. In normal mode, a `timeline operator` is followed by a `timeline motion` (operator first, motion second). When this action sequence is entered, it will result in the `timeline operator` being called on the timeline section between the cursor position before the motion and after the motion.
 
-So one could enter <kbd>sL</kbd>, to create `(s = "SelectItems", L = "NextMeasure")`, and select the items up to the next measure.
+So one could enter <kbd>sL</kbd>, to create `(s = "SelectItemsAndSplit", L = "NextMeasure")`. This selects items in the range **and splits at its boundaries**; it is not selection-only.
 
 There are various action types in reaper-keys.
 

@@ -1,11 +1,10 @@
-local root = debug.getinfo(1, 'S').source:match ".*reaper.keys[^\\/]*[\\/]":sub(2)
+local root = debug.getinfo(1, 'S').source:match('@?(.*[/\\])') .. '../'
 package.path = root .. "internal/?.lua;" .. root .. "vendor/?.lua;" .. root .. "vendor/scythe/?.lua"
 
 local actions = require 'definitions.actions'
 local buildCommandWithCompletions = require 'build'
 local config = require 'definitions.config'.general
-local executeCommand = require 'execute_command'
-local executeMetaCommand = require 'meta_command'
+local dispatch = require 'dispatch'
 local feedback = require 'gui.feedback.controller'
 local log = require 'log'
 local reaper_state = require 'reaper_state'
@@ -76,6 +75,7 @@ local macos_shift_fix = {
 ---@return string
 local function ctxToKey(ctx)
     local _, _, mod, code = ctx:find "^key:(.*):(.*)$"
+    if not mod then return nil end
     local virt, ctrl, shift = mod:match "V", mod:match "C", mod:match "S"
     local alt = mod:match "A" and "M" or nil
     code = tonumber(code) or -1
@@ -92,62 +92,13 @@ local function ctxToKey(ctx)
     end
 
     local use_aliases = not (not virt and 37 <= code and code <= 40)
-    local key = use_aliases and aliases[code] or string.char(code)
+    local key = use_aliases and aliases[code]
+    if not key then
+        if code < 0 or code > 255 then return nil end
+        key = string.char(code)
+    end
     if not ctrl and not alt and not shift then return key end
     return ("<%s%s%s-%s>"):format(ctrl or "", alt or "", shift or "", key)
-end
-
----@param command Command
----@return boolean
-local function isRepeatableCommand(command)
-    for _, action_type in ipairs(command.action_sequence) do
-        for _, action_type_match in ipairs(config.repeatable_commands_action_type_match) do
-            if action_type:find(action_type_match) then
-                return true
-            end
-        end
-    end
-    return false
-end
-
----@param state State
----@return State
-local function checkIfConsistentState(state)
-    local serialized_state = reaper_state.getState()
-    for key, value in pairs(serialized_state) do
-        if key == 'last_command' then
-            local left = serpent.line(state.last_command, { comment = false })
-            local right = serpent.line(serialized_state.last_command, { comment = false })
-            if left ~= right then return serialized_state end
-        elseif value ~= state[key] then
-            return serialized_state
-        end
-    end
-    return state
-end
-
----@param state State
----@param command Command
----@return State
-local function handleCommand(state, command)
-    local new_state = executeMetaCommand(state, command)
-    if new_state then return new_state end
-
-    executeCommand(command)
-
-    -- internal commands may have changed the state
-    state = checkIfConsistentState(state)
-
-    if isRepeatableCommand(command) then
-        state.last_command = command
-    end
-
-    if state.macro_recording then
-        reaper_state.appendToMacro(state.macro_register, command)
-    end
-
-    state.key_sequence = ""
-    return state
 end
 
 ---@param key string
@@ -177,24 +128,6 @@ local function formatKeySequence(sequence)
     return key_sequence_string .. "-"
 end
 
----@param action_keys Action[]
----@return string
-local function formatActionKeys(action_keys)
-    local desc = ""
-    for _, command_part in pairs(action_keys) do
-        if type(command_part) == 'table' then
-            desc = desc .. '['
-            for _, additional_args in pairs(command_part) do
-                desc = desc .. ' ' .. additional_args
-            end
-            desc = desc .. ' ]'
-        else
-            desc = desc .. (command_part) .. " "
-        end
-    end
-    return desc
-end
-
 ---@param state State
 ---@param key_press KeyPress
 ---@return State
@@ -213,31 +146,29 @@ local function step(state, key_press)
         and key_press.key
         or state.key_sequence .. key_press.key
 
-    log.info(("new key sequence %s"):format(new_state.key_sequence))
+    if log.enabled('info') then log.info('new key sequence ' .. new_state.key_sequence) end
     local command, completions = buildCommandWithCompletions(new_state, true)
     if command then
-        log.trace(("command built: %s"):format(serpent.block(command, { comment = false})))
+        if log.enabled('trace') then log.trace(serpent.block(command, {comment = false})) end
 
-        reaper.Undo_BeginBlock2(0)
-        new_state = handleCommand(new_state, command)
-        local description = formatActionKeys(command.action_keys)
-        reaper.Undo_EndBlock2(0, ('reaper-keys: %s'):format(description), 1)
+        local description
+        new_state, description = dispatch(new_state, command)
 
         if config.show_feedback_window then
             feedback.displayMessage(description)
         end
-        return new_state
-    end
-
-    if not config.show_feedback_window then
-        return new_state
+        return new_state, command.action_keys[1] == 'ShowBindingList'
     end
 
     if not completions then
-        feedback.displayMessage(("Undefined key sequence %s"):format(new_state.key_sequence))
+        if config.show_feedback_window then
+            feedback.displayMessage(('Unbound: %s. Esc resets; Ctrl+Alt+X searches bindings.'):format(new_state.key_sequence))
+        end
         new_state.key_sequence = ''
         return new_state
     end
+
+    if not config.show_feedback_window then return new_state end
 
     feedback.displayMessage(formatKeySequence(state.key_sequence))
     feedback.displayCompletions(completions)
@@ -250,16 +181,18 @@ local function reaperKeys()
     local main_ctx = section_id == 0
     ---@type KeyPress
     local hotkey = { context = main_ctx and "main" or "midi", key = ctxToKey(ctx) }
+    if not hotkey.key then return end
 
-    log.info(("Input: %s"):format(serpent.line(hotkey, { comment = false })))
+    if log.enabled('info') then log.info(serpent.line(hotkey, {comment = false})) end
     if config.show_feedback_window then feedback.clear() end
 
     local state = reaper_state.getState()
-    local new_state = step(state, hotkey)
+    local new_state, owns_focus = step(state, hotkey)
     reaper_state.setState(new_state)
 
-    log.info(("New state: %s"):format(serpent.block(new_state, {comment = false})))
-    if not config.show_feedback_window then return end
+    if log.enabled('info') then log.info(serpent.block(new_state, {comment = false})) end
+    -- The binding browser owns the keyboard (and this script's gfx window).
+    if not config.show_feedback_window or owns_focus then return end
 
     feedback.displayState(new_state)
 
@@ -273,12 +206,22 @@ local function reaperKeys()
     if not main_ctx or not new_state or new_state.key_sequence ~= "" then return end
     if not hotkey.key:lower():match "o" then return end
     local keys = new_state.last_command.action_keys
-    if #keys ~= 1 or not keys[1]:match "^EnterTrack" then return end
+    if #keys ~= 1 or type(keys[1]) ~= 'string' or not keys[1]:match '^EnterTrack' then return end
     reaper.Main_OnCommand(actions.RenameTrack, 0)
 end
 
 local function messageHandler(err)
     log.error(debug.traceback(err))
+    local state = reaper_state.getState()
+    state.key_sequence = ''
+    state.macro_recording = false
+    reaper_state.setState(state)
+    if config.show_feedback_window then
+        feedback.clear()
+        feedback.displayMessage('Command failed. Input reset; check console. Undo may recover partial edits.')
+        -- Do not hide the original error if opening the feedback GUI also fails.
+        pcall(feedback.displayState, state)
+    end
 end
 
 xpcall(reaperKeys, messageHandler)

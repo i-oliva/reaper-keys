@@ -2,8 +2,10 @@ local TextUtils = {}
 
 function TextUtils.doCtrlChar(self, state, func, ...)
 
-  if state.kb.ctrl then
-    func(self, ... and table.unpack({...}))
+  -- gfx.getchar() encodes Ctrl/Cmd+A..Z as 1..26. The modifier may
+  -- already be released when the deferred GUI reads the queued character.
+  if state.kb.ctrl or (state.kb.char >= 1 and state.kb.char <= 26) then
+    func(self, ...)
 
     -- Flag to bypass the "clear selection" logic in :onType()
     return true

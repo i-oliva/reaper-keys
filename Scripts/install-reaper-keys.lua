@@ -1,8 +1,10 @@
 -- @description reaper-keys: map keystroke combinations to actions like in vim
--- @version 2.0.0-a20
+-- @version 2.0.0-a21
+-- @about Performance and production-coach fork; see docs/performance.md.
 -- @author gwatcha
 -- @links
---   GitHub repository https://github.com/gwatcha/reaper-keys
+--   GitHub repository https://github.com/i-oliva/reaper-keys
+--   Upstream https://github.com/gwatcha/reaper-keys
 -- @provides
 --   ../internal/**/*
 --   ../vendor/**/*
@@ -17,7 +19,7 @@ end
 local clash = 65536
 local key_groups = {
     letters = { mod_id = 1, keys = charCodes(65, 25) }, -- A-Z
-    numbers = { mod_id = 1, keys = charCodes(48, 10) }, -- 0-9
+    numbers = { mod_id = 1, keys = charCodes(48, 9) }, -- 0-9
     special = {
         mod_id = 1,
         keys = {
@@ -123,6 +125,13 @@ local function concat_path(...) return table.concat({ ... }, package.config:sub(
 local keymap_dir = concat_path(reaper.GetResourcePath(), 'KeyMaps')
 local keymap_path = concat_path(keymap_dir, 'reaper-keys.ReaperKeyMap')
 reaper.RecursiveCreateDirectory(keymap_dir, 0)
+local previous = io.open(keymap_path, 'rb')
+if previous then
+    local backup_path = keymap_path .. '.backup-' .. os.date('%Y%m%d-%H%M%S')
+    local backup = io.open(backup_path, 'wb')
+    if not backup then previous:close(); return reaper.MB('Cannot back up existing keymap. Nothing changed.', 'Error', 0) end
+    backup:write(previous:read('*a')); backup:close(); previous:close()
+end
 local keymap = io.open(keymap_path, "w")
 if not keymap then return reaper.MB("Failed to create " .. keymap_path, "Error", 0) end
 
@@ -152,8 +161,10 @@ for section_name, section_id in pairs(sections) do
     end
 end
 
+keymap:close()
 local action_str = version >= 7. and "shortcuts/custom actions, import all sections" or ""
 reaper.MB("Installation finished, now import reaper-keys.ReaperKeyMap:\n\t" ..
     "Actions list > Key Map > Import " .. action_str .. "\n" ..
-    "WARNING: this will overwrite ALL your keybindings",
+    "Before importing: export your current keymap as a backup. Importing replaces mapped shortcuts.\n" ..
+    "After importing: Space ? opens the production coach. Esc resets; Ctrl+Alt+X searches.",
     "Installation finished", 0)

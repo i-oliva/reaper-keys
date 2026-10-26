@@ -31,8 +31,11 @@ end
 
 ---@param sequence string
 function utils.splitFirstKey(sequence)
-    local keys = utils.splitKeysIntoTable(sequence)
-    return keys[1], table.concat(keys, "", 2)
+    if sequence == '' then return nil, '' end
+    local first = sequence:match('^(<[^<>]+>)')
+        or sequence:match('^(<[^<>]+[<>]>)')
+        or sequence:sub(1, 1)
+    return first, sequence:sub(#first + 1)
 end
 
 return utils

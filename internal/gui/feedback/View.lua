@@ -8,7 +8,7 @@ local model_interface = require 'gui.feedback.model'
 require 'scythe'
 local Font = require 'public.font'
 local GUI = require 'gui.core'
-View = {}
+local View = {}
 
 function View:updateElementDimensions()
     Font.set("feedback_main")
@@ -50,7 +50,8 @@ local function createElements()
 end
 
 local function createWindow(props)
-    local settings = model_interface.getKey("window_settings") or {}
+    local settings = require('reaper_state').get('feedback_window')
+        or model_interface.getKey('window_settings') or {}
     local window = GUI.createWindow({
         name = "Reaper Keys Feedback",
         w = settings.w,
@@ -109,14 +110,14 @@ function View:updateMessage(model)
 end
 
 function View:open()
-    local update_number = 0
+    local update_number = -1
     local show_after = self.props.show_after
     local hide_after = self.props.hide_after
     local completions_triggered = false
     local update_time = reaper.time_precise()
 
     local function main()
-        local model = model_interface.get()
+        local model = model_interface.get() or {}
         local completions = model.completions
 
         if model.update_number ~= update_number then

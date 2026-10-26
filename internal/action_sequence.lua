@@ -2,6 +2,7 @@ local actions = require 'definitions.actions'
 local movements = require 'movements'
 local config = require 'definitions.config'.general
 local log = require 'log'
+local repetitions = require 'repetition'
 local persist_visual_timeline_selection = require 'definitions.config'.general.persist_visual_timeline_selection
 local reaper_utils = require "movement_utils"
 local reaper_state = require "reaper_state"
@@ -54,7 +55,7 @@ function action_sequences.run(action)
         return fn(register)
     end
 
-    local prefixedRepetitions = action.prefixedRepetitions or 1
+    local prefixedRepetitions = repetitions(action.prefixedRepetitions)
     if action.toTrack then
         movements.toTrack(prefixedRepetitions)
         reaper.Main_OnCommand(actions.ScrollToSelectedTracks, 0)
@@ -62,7 +63,7 @@ function action_sequences.run(action)
     end
 
     local midiCommand = action.midiCommand or false
-    for _ = 1, (action.repetitions or 1) * prefixedRepetitions do
+    for _ = 1, repetitions((action.repetitions or 1) * prefixedRepetitions) do
         for _, sub_action in ipairs(action) do
             if type(sub_action) == 'table' then
                 action_sequences.run(sub_action)

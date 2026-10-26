@@ -13,6 +13,7 @@ local function doLog(msg) reaper.ShowConsoleMsg(("%s\n"):format(msg)) end
 
 ---@type Logger
 local log = {
+    enabled = function(level) return idxs[level] >= (idxs[log_level] or idxs.error) end,
     trace = function(msg) if 1 >= idxs[log_level] then doLog(msg) end end,
     debug = function(msg) if 2 >= idxs[log_level] then doLog(msg) end end,
     info = function(msg) if 3 >= idxs[log_level] then doLog(msg) end end,

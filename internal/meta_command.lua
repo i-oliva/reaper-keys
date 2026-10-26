@@ -1,7 +1,9 @@
-local binding_list = require 'gui.binding_list.controller'
 local executeCommand = require 'execute_command'
 local reaper_state = require 'reaper_state'
 local default_state = require 'default_state'
+local repetitions = require 'repetition'
+local playing = {}
+local macro_depth, macro_steps = 0, 0
 
 ---@alias MetaFunction fun(state: State, command: Command): State
 ---@type { [string]: MetaFunction }
@@ -34,18 +36,30 @@ function commands.PlayMacro(state, command)
     local register = action.register
     if not register then return default_state end
 
+    assert(not playing[register], 'Recursive macro: ' .. register)
+    assert(macro_depth < 16, 'Macro nesting limit reached')
+    local count = repetitions(action.prefixedRepetitions)
     local macro_commands = reaper_state.getMacro(register)
     if macro_commands then
-        for _ = 1, action.prefixedRepetitions or 1 do
-            for _, macro_command in pairs(macro_commands) do
-                local fn = getFn(macro_command)
-                if fn then
-                    fn(state, macro_command)
-                else
-                    executeCommand(macro_command)
+        if macro_depth == 0 then macro_steps = 0 end
+        playing[register], macro_depth = true, macro_depth + 1
+        local ok, err = xpcall(function()
+            for _ = 1, count do
+                for _, macro_command in ipairs(macro_commands) do
+                    macro_steps = repetitions(macro_steps + 1)
+                    local fn = getFn(macro_command)
+                    if fn then
+                        state = fn(state, macro_command) or state
+                    else
+                        local token = reaper_state.stateToken()
+                        executeCommand(macro_command)
+                        if token ~= reaper_state.stateToken() then state = reaper_state.getState() end
+                    end
                 end
             end
-        end
+        end, debug.traceback)
+        playing[register], macro_depth = nil, macro_depth - 1
+        if not ok then error(err, 0) end
         if state.macro_recording then
             reaper_state.appendToMacro(state.macro_register, command)
         end
@@ -83,11 +97,15 @@ function commands.RepeatLastCommand(state, command)
     if not action then return default_state end
     local last_command = state.last_command
     local fn = getFn(last_command)
-    local repetitions = action.prefixedRepetitions or 1
+    local count = repetitions(action.prefixedRepetitions)
     if fn then
-        for _ = 1, repetitions do fn(state, last_command) end
+        for _ = 1, count do state = fn(state, last_command) or state end
     else
-        for _ = 1, repetitions do executeCommand(last_command) end
+        for _ = 1, count do
+            local token = reaper_state.stateToken()
+            executeCommand(last_command)
+            if token ~= reaper_state.stateToken() then state = reaper_state.getState() end
+        end
     end
 
     if state.macro_recording then
@@ -99,11 +117,21 @@ function commands.RepeatLastCommand(state, command)
     return state
 end
 
+function commands.ShowProductionCoach(state)
+    state.key_sequence = ''
+    local path = debug.getinfo(1, 'S').source:match('@?(.*[/\\])') .. '../Scripts/show-production-coach.lua'
+    local id = reaper.AddRemoveReaScript(true, 0, path, true)
+    assert(id ~= 0, 'Could not register production coach')
+    -- A separate Lua state/window, after the feedback strip has updated.
+    reaper.defer(function() reaper.Main_OnCommand(id, 0) end)
+    return state
+end
+
 ---@param state State
 ---@return State
 function commands.ShowBindingList(state, _)
     state.key_sequence = ""
-    binding_list.open(state)
+    require('gui.binding_list.controller').open(state)
     return state
 end
 

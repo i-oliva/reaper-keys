@@ -44,7 +44,7 @@ In this mode, `timeline motion` and `timeline selection` action types extend or 
 Also the `timeline operator` type does not require a `timeline motion` or `timeline selector` to come before, as in normal mode, and instead operates immediately
 on the current timeline selection and then exits visual timeline mode.
 
-It also allows for the execution of `visual track command` types.
+It also allows for the execution of `visual timeline command` types.
 
 ### Available Action Sequences
 

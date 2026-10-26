@@ -12,7 +12,7 @@ local GUI = require('gui.core')
 local gui_utils = require('gui.utils')
 local scale = gui_utils.scale
 
-View = {}
+local View = {}
 
 function View:updateElementDimensions()
   Font.set("binding_list_main")
@@ -201,7 +201,7 @@ function View:new(props)
 
   self.window = createBindingListWindow(props)
 
-  self.selected_i = 0
+  self.selected_i = 1
   self.action_executed = false
 
   local query = GUI.findElementByName("query")

@@ -74,13 +74,14 @@ local gui = {
 
 ---@type GeneralConfig
 local general = {
-    show_start_up_message = true,
+    show_start_up_message = false, -- use Space ? for the production coach
     dock_feedback_window = true,
     show_feedback_window = true,
     -- On some keyboards, F12 conflicts with { (S-[), F13 conflicts with } (S-]),
     -- F14 conflicts with | (S-\), and F15 conflicts with ~
     use_f12_f15 = false,
     profile = false,
+    max_repetitions = 10000, -- reject accidental huge counts; never silently truncate
     -- should operators in visual modes reset the selection or have it persist?
     persist_visual_timeline_selection = true,
     persist_visual_track_selection = false,

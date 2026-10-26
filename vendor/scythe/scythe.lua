@@ -15,11 +15,9 @@ end
 Scythe = {}
 Scythe.args = args and args[1] or {}
 
-Scythe.libPath = reaper.GetExtState("Scythe v3", "libPath")
-if not Scythe.libPath or Scythe.libPath == "" then
-    -- reaper.MB("Couldn't find the Scythe library. Please run 'Set Scythe library path' in your Action List.", "Whoops!", 0) -- luacheck: ignore 631
-    return
-end
+-- This is the bundled Scythe copy. Always initialize its string/table helpers,
+-- even on a clean REAPER install with no globally registered Scythe library.
+Scythe.libPath = debug.getinfo(1, 'S').source:match('@?(.*[/\\])')
 
 Scythe.libRoot = Scythe.libPath:match("(.*[/\\])".."[^/\\]+[/\\]")
 

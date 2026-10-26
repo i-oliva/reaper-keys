@@ -365,6 +365,7 @@ return {
     DecreaseTransientDetectionSensitivity = { 41536, prefixRepetitionCount = true },
     AdjustTransientDetection = 41208,
     NoOp = 65535,
+    ShowProductionCoach = { metaCommand = true },
     NudgeTrackPanLeft10Times = { "NudgeTrackPanLeft", repetitions = 10, prefixRepetitionCount = true },
     NudgeTrackPanLeft = { 40283, prefixRepetitionCount = true },
     NudgeTrackPanRight10Times = { "NudgeTrackPanRight", repetitions = 10, prefixRepetitionCount = true },
